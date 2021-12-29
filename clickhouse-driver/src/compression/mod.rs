@@ -8,12 +8,8 @@ use byteorder::{LittleEndian, ReadBytesExt};
 use lz4::liblz4::LZ4_decompress_safe;
 use lz4::liblz4::{LZ4_compressBound, LZ4_compress_default};
 
+use naive_cityhash::cityhash128;
 use tokio::io::{AsyncBufRead, AsyncRead, ReadBuf};
-
-#[cfg(not(feature = "cityhash_rs"))]
-use clickhouse_driver_cth::city_hash_128;
-#[cfg(feature = "cityhash_rs")]
-use clickhouse_driver_cthrs::city_hash_128;
 
 use crate::errors;
 use crate::errors::DriverError;
@@ -72,11 +68,11 @@ where
 
             let compressed = cursor.into_inner();
 
-            let hash = city_hash_128(&compressed[..]);
+            let hash = cityhash128(&compressed[..]);
 
             //self.inner.write_all(&*hash)?;
-            self.inner.write_u64::<LittleEndian>(hash.0)?;
-            self.inner.write_u64::<LittleEndian>(hash.1)?;
+            self.inner.write_u64::<LittleEndian>(hash.lo)?;
+            self.inner.write_u64::<LittleEndian>(hash.hi)?;
             self.inner.write_all(&compressed[..])?;
         }
         self.inner.flush()
@@ -142,9 +138,13 @@ fn read_head(buf: &[u8]) -> io::Result<(u32, u32)> {
 }
 
 fn decompress(buf: &[u8], raw_size: usize) -> io::Result<Vec<u8>> {
-    let calculated_hash = city_hash_128(&buf[16..]);
+    let calculated_hash = cityhash128(&buf[16..]);
 
-    if calculated_hash != &buf[0..16] {
+    // Compare Hash with first 16 byte of Clickhouse Packet Header
+    // @note it's work only with little endian system only
+    if calculated_hash.lo != naive_cityhash::fetch64(&buf[0..8])
+        || calculated_hash.hi != naive_cityhash::fetch64(&buf[8..16])
+    {
         return Err(io::Error::new(
             io::ErrorKind::InvalidData,
             errors::DriverError::BadHash,

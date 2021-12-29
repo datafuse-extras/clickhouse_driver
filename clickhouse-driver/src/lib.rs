@@ -5,7 +5,7 @@
 //! add next lines in dependencies section of `Cargo.toml`
 //!  ```toml
 //!   clickhouse-driver = { version="0.1.0-alpha.1", path="../path_to_package/clickhouse-driver"}
-//!   clickhouse-driver-cthrs = { version="0.1.0", path="../path_to_package/cityhash-rs"}
+//!   naive-cityhash = { version="0.1.0"}
 //!   ```
 //! ## Supported Clickhouse data types
 //! * Date | DateTime | DateTime64- read/write
@@ -37,10 +37,6 @@
 extern crate byteorder;
 extern crate chrono;
 extern crate chrono_tz;
-#[cfg(not(feature = "cityhash_rs"))]
-extern crate clickhouse_driver_cth;
-#[cfg(feature = "cityhash_rs")]
-extern crate clickhouse_driver_cthrs;
 
 extern crate core;
 #[macro_use]
@@ -58,6 +54,7 @@ extern crate thiserror;
 extern crate tokio;
 extern crate url;
 extern crate uuid;
+
 use pool::options::Options;
 
 #[cfg(not(target_endian = "little"))]
