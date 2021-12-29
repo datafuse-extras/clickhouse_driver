@@ -1,5 +1,5 @@
 [workspace]
-members = ["clickhouse-driver", "lz4a", "derive"]
+members = ["clickhouse-driver", "derive"]
 
 [profile.release]
 opt-level = 3
