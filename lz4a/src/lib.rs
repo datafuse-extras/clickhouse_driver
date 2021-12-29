@@ -122,7 +122,7 @@ mod test {
     #[test]
     fn test_version_number() {
         let version = unsafe { LZ4_versionNumber() };
-        assert_eq!(version, 10902 as c_int);
+        assert_eq!(version, 10902_i32);
 
         // 640 kb original size
         assert_eq!(unsafe { LZ4_compressBound(640 * 1024) }, 657946);
@@ -179,8 +179,6 @@ mod test {
                 assert_eq!(&comp[0..compressed_sz], &orig[0..compressed_sz]);
             }
         }
-
-        assert_eq!(1, 1);
     }
 
     #[test]

@@ -34,7 +34,7 @@
 //! - default database: "default"
 //!
 #![recursion_limit = "128"]
-#![allow(clippy::unknown_clippy_lints)]
+#![allow(clippy::renamed_and_removed_lints)]
 extern crate byteorder;
 extern crate chrono;
 extern crate chrono_tz;
