@@ -140,7 +140,11 @@ fn read_head(buf: &[u8]) -> io::Result<(u32, u32)> {
 fn decompress(buf: &[u8], raw_size: usize) -> io::Result<Vec<u8>> {
     let calculated_hash = cityhash128(&buf[16..]);
 
-    if calculated_hash != cityhash128(&buf[0..16]) {
+    // Compare Hash with first 16 byte of Clickhouse Packet Header
+    // @note it's work only with little endian system only
+    if calculated_hash.lo != naive_cityhash::fetch64(&buf[0..8])
+        || calculated_hash.hi != naive_cityhash::fetch64(&buf[8..16])
+    {
         return Err(io::Error::new(
             io::ErrorKind::InvalidData,
             errors::DriverError::BadHash,
