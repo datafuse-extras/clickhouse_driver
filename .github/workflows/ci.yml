@@ -41,4 +41,4 @@ jobs:
     - name: Int128 Build
       run: |
         cd clickhouse-driver
-        cargo build --no-default-features --features 'cityhash int128'
+        cargo build --no-default-features --features 'int128'

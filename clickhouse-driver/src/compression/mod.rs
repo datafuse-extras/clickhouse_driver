@@ -4,15 +4,11 @@ use std::task::{Context, Poll};
 
 use byteorder::WriteBytesExt;
 use byteorder::{LittleEndian, ReadBytesExt};
-use tokio::io::{AsyncBufRead, AsyncRead};
-
-#[cfg(not(feature = "cityhash_rs"))]
-use clickhouse_driver_cth::city_hash_128;
-#[cfg(feature = "cityhash_rs")]
-use clickhouse_driver_cthrs::city_hash_128;
 pub use clickhouse_driver_lz4::{
     LZ4_Compress, LZ4_CompressBounds, LZ4_Decompress, LZ4_compress_default,
 };
+use naive_cityhash::cityhash128;
+use tokio::io::{AsyncBufRead, AsyncRead};
 
 use crate::errors;
 use crate::errors::DriverError;
@@ -64,11 +60,11 @@ where
 
             let compressed = cursor.into_inner();
 
-            let hash = city_hash_128(&compressed[..]);
+            let hash = cityhash128(&compressed[..]);
 
             //self.inner.write_all(&*hash)?;
-            self.inner.write_u64::<LittleEndian>(hash.0)?;
-            self.inner.write_u64::<LittleEndian>(hash.1)?;
+            self.inner.write_u64::<LittleEndian>(hash.lo)?;
+            self.inner.write_u64::<LittleEndian>(hash.hi)?;
             self.inner.write_all(&compressed[..])?;
         }
         self.inner.flush()
@@ -133,9 +129,9 @@ fn read_head(buf: &[u8]) -> io::Result<(u32, u32)> {
 }
 
 fn decompress(buf: &[u8], raw_size: usize) -> io::Result<Vec<u8>> {
-    let calculated_hash = city_hash_128(&buf[16..]);
+    let calculated_hash = cityhash128(&buf[16..]);
 
-    if calculated_hash != &buf[0..16] {
+    if calculated_hash != cityhash128(&buf[0..16]) {
         return Err(io::Error::new(
             io::ErrorKind::InvalidData,
             errors::DriverError::BadHash,

@@ -55,7 +55,7 @@ tokio-0.2.x.
 ```toml   
  clickhouse-driver = { version="0.1.0-alpha.3", path="../path_to_package/clickhouse-driver"}
  clickhouse-driver-lz4 = { version="0.1.0", path="../path_to_package/lz4a"}
- clickhouse-driver-cthrs = { version="0.1.0", path="../path_to_package/cityhash-rs"}
+ naive-cityhash = { version="0.1.0" }
 
 ```
 - Add usage in main.rs

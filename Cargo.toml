@@ -1,8 +1,5 @@
 [workspace]
-
-members = [
-    "clickhouse-driver","cityhash","lz4a","derive","cityhash-rs"
-]
+members = ["clickhouse-driver", "lz4a", "derive"]
 
 [profile.release]
 opt-level = 3

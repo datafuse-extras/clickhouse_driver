@@ -235,7 +235,10 @@ where
     }
 
     fn is_compatible(&self, field: &Field) -> bool {
-        matches!(field.sql_type, SqlType::String | SqlType::FixedString(_) | SqlType::Enum8 | SqlType::Enum16)
+        matches!(
+            field.sql_type,
+            SqlType::String | SqlType::FixedString(_) | SqlType::Enum8 | SqlType::Enum16
+        )
     }
 }
 /// IPv4 output column
