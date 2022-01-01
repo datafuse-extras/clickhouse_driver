@@ -110,7 +110,7 @@ impl Inner {
                     drop(lock);
                     return;
                 }
-                Err(econn) => econn.0,
+                Err(econn) => econn,
             }
         } else {
             conn
@@ -235,7 +235,7 @@ impl Pool {
                 return Err(DriverError::PoolDisconnected.into());
             }
 
-            if let Ok(conn) = self.inner.new.pop() {
+            if let Some(conn) = self.inner.new.pop() {
                 let mut conn = Connection::new(self.clone(), conn);
 
                 if inner.options.ping_before_query {
