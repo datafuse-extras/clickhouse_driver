@@ -281,7 +281,7 @@ impl Default for Options {
             database: "default".into(),
             username: "default".into(),
             password: "".into(),
-            compression: CompressionMethod::LZ4,
+            compression: CompressionMethod::None,
             pool_min: DEFAULT_MIN_POOL_SIZE,
             pool_max: DEFAULT_MAX_POOL_SIZE,
             keepalive: None,
