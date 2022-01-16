@@ -348,7 +348,7 @@ mod test {
         let pool = Pool::create("tcp://localhost?ping_timeout=1ms").unwrap();
 
         assert_eq!(pool.options().database, "default");
-        assert_eq!(pool.options().compression, CompressionMethod::LZ4);
+        assert_eq!(pool.options().compression, CompressionMethod::None);
         assert_eq!(pool.options().username, "default");
         assert_eq!(pool.options().password, "");
         assert_eq!(pool.inner.hosts[0], "localhost:9000");
