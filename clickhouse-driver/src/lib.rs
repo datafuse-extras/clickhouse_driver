@@ -5,7 +5,7 @@
 //! add next lines in dependencies section of `Cargo.toml`
 //!  ```toml
 //!   clickhouse-driver = { version="0.1.0-alpha.1", path="../path_to_package/clickhouse-driver"}
-//!   naive-cityhash = { version="0.1.0"}
+//!   naive-cityhash = { version="0.2.0"}
 //!   ```
 //! ## Supported Clickhouse data types
 //! * Date | DateTime | DateTime64- read/write
@@ -41,12 +41,11 @@ extern crate chrono_tz;
 extern crate core;
 #[macro_use]
 extern crate futures;
-extern crate hostname;
-#[macro_use]
-extern crate lazy_static;
 #[cfg(lz4)]
 extern crate clickhouse_driver_lz4a;
+extern crate hostname;
 extern crate log;
+extern crate once_cell;
 extern crate parking_lot;
 #[cfg(test)]
 extern crate rand;
@@ -55,6 +54,7 @@ extern crate tokio;
 extern crate url;
 extern crate uuid;
 
+use once_cell::sync::Lazy;
 use pool::options::Options;
 
 #[cfg(not(target_endian = "little"))]
@@ -82,15 +82,13 @@ pub const CLICK_HOUSE_REVISION: u64 = 54405;
 pub const CLICK_HOUSE_DBMSVERSION_MAJOR: u64 = 1;
 pub const CLICK_HOUSE_DBMSVERSION_MINOR: u64 = 1;
 
-lazy_static! {
-    static ref HOSTNAME: String = {
-        hostname::get().map_or_else(
-            |_orig| String::new(),
-            |s| s.into_string().unwrap_or_default(),
-        )
-    };
-    static ref DEF_OPTIONS: Options = crate::pool::options::Options::default();
-}
+static HOSTNAME: Lazy<String> = Lazy::new(|| {
+    hostname::get().map_or_else(
+        |_orig| String::new(),
+        |s| s.into_string().unwrap_or_default(),
+    )
+});
+static DEF_OPTIONS: Lazy<Options> = Lazy::new(|| pool::options::Options::default());
 
 pub fn description() -> String {
     format!(
