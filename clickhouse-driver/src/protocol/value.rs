@@ -7,6 +7,7 @@ use crate::types::Decimal128;
 use crate::types::{Decimal, Decimal32, Decimal64, DecimalBits, Field, FieldMeta, SqlType, SCALE};
 use byteorder::{LittleEndian, WriteBytesExt};
 use chrono::{Date, DateTime, NaiveDate, NaiveDateTime, Utc};
+use once_cell::sync::Lazy;
 use std::io;
 use std::io::Write;
 use std::net::{Ipv4Addr, Ipv6Addr};
@@ -16,12 +17,8 @@ pub trait IntoColumn<'b>: Sized {
     fn to_column(this: Vec<Self>) -> Box<dyn AsOutColumn + 'b>;
 }
 
-lazy_static! {
-    /// EPOCH is January 1, 1970 0:00:00 UTC (zero point for "UNIX timestamp").
-    static ref EPOCH: chrono::NaiveDate  = {
-         chrono::NaiveDate::from_ymd(1970,1,1)
-    };
-}
+/// EPOCH is January 1, 1970 0:00:00 UTC (zero point for "UNIX timestamp").
+static EPOCH: Lazy<chrono::NaiveDate> = Lazy::new(|| chrono::NaiveDate::from_ymd(1970, 1, 1));
 
 pub(crate) trait WriteColumn {
     fn write_column(&self, field: &Field, writer: &mut dyn Write) -> Result<()>;
